@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App</title>
+  <style>
+    form {
+      display: flex; /* Встановлюємо flex контейнер для форми */
+      align-items: center; /* Вирівнюємо елементи вертикально */
+    }
+    form p {
+      margin-right: 10px; /* Задаємо відступ для тексту "Repository URL" */
+    }
+    form input[type="text"],
+    form button {
+      margin-right: 10px; /* Задаємо відступ для input та кнопки */
+    }
+  </style>
+</head>
+<body>
+<form action="/" method="get">
+  <p>Repository URL:</p>
+  <input type="text" name="repo" placeholder="Enter repository URL" value={{repo}}>
+  <button type="submit">Start</button>
+</form>
+<ul>
+  {{#each result}}
+    <li>{{this}}</li>
+  {{/each}}
+</ul>
+</body>
+</html>

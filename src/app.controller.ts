@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Get, Post, Query, Render } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  private result: any[];
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Render('index')
+  root(@Query('repo') repo?: string) {
+    if (repo) {
+      this.result = repo.split('');
+      return { result: this.result, repo };
+    }
+
+    return { repo };
   }
 }
