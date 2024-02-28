@@ -1,37 +1,29 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import { IGithubContributions, IGithubContributors } from './github.interface';
+import {
+  IGetReposWithSimilarContributorsRes,
+  IGithubContributions,
+  IGithubContributors,
+} from './github.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GithubService {
   constructor(private configService: ConfigService) {}
 
-  async getReposWithSimilarContributors(url: string) {
+  async getReposWithSimilarContributors(
+    url: string,
+  ): Promise<IGetReposWithSimilarContributorsRes[]> {
     try {
       const token = this.configService.get<string>('githubToken');
       let headers = {};
       if (token) {
         headers = { Authorization: `Bearer ${token}` };
       }
-
-      // return [
-      //   {
-      //     name: '1',
-      //     link: 'https://github.com/nestjsx/nestjs-config/issues/49',
-      //     matches: 5,
-      //   },
-      //   {
-      //     name: '2',
-      //     link: 'https://github.com/nestjsx/nestjs-config/issues/49',
-      //     matches: 51,
-      //   },
-      //   {
-      //     name: '3',
-      //     link: 'https://github.com/nestjsx/nestjs-config/issues/49',
-      //     matches: 25,
-      //   },
-      // ];
 
       const urlSplit = url.split('/');
       if (urlSplit.length < 2) {
@@ -40,30 +32,28 @@ export class GithubService {
       const owner = urlSplit[urlSplit.length - 2];
       const repo = urlSplit[urlSplit.length - 1];
 
-      // const token = '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'; //'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';
-
       const contributorsMain = await this.getContributors(
         `${owner}/${repo}`,
         headers,
       );
 
-      console.log('COUNT OF contributorsMain:', contributorsMain.length);
+      if (contributorsMain.length === 0) {
+        throw new NotFoundException(
+          'Contributors for this repository were not found. Possible reasons: ' +
+            '1. The URL is entered incorrectly; ' +
+            '2. The number of contributors is too large to process using the GitHub API; ' +
+            '3. This repository has no contributors.',
+        );
+      }
 
       const contributionsRepos = await this.getContributions(
         contributorsMain,
         headers,
       );
 
-      console.log('COUNT OF contributionsRepos:', contributionsRepos.length);
-
       const uniqueContributionsRepos = this.removeDuplicates(
         contributionsRepos,
         repo,
-      );
-
-      console.log(
-        'COUNT OF uniqueContributionsRepos:',
-        uniqueContributionsRepos,
       );
 
       const matches = await this.getContributorsMatches(
@@ -74,7 +64,6 @@ export class GithubService {
 
       const sortedMatches = matches.sort(this.compareObjectsByField('matches'));
 
-      console.log('==================== matches', sortedMatches.slice(0, 5));
       return sortedMatches.slice(0, 5).map((item) => {
         return {
           ...item,
@@ -82,8 +71,6 @@ export class GithubService {
         };
       });
     } catch (error) {
-      console.log('================ ERROR', error?.response?.data || error);
-      //throw new Error("Не вдалося отримати список контриб'юторів");
       throw error;
     }
   }
@@ -100,7 +87,7 @@ export class GithubService {
       try {
         const contributorsMainCurrentRes: AxiosResponse<IGithubContributors[]> =
           await axios.get(
-            `https://api.github.com/repos/${ownerAndRepo}/contributors?per_page=100&page=${page}`,
+            `https://api.github.com/repos/${ownerAndRepo}/contributors?per_page=10&page=${page}`,
             { headers },
           );
 
@@ -113,7 +100,12 @@ export class GithubService {
         countOfContributorsOnCurrentPage = contributorsMainCurrent.length;
         page++;
       } catch (error) {
-        console.log(`WARNING FOR ${ownerAndRepo}:`, error.response);
+        // console.log(
+        //   `WARNING FOR ${ownerAndRepo}:`,
+        //   error.response.status,
+        //   error.response.statusText,
+        //   error.response.data,
+        // );
         // throw new UnprocessableEntityException('Incorrect URL!');
       }
     } while (countOfContributorsOnCurrentPage !== 0);
@@ -155,7 +147,6 @@ export class GithubService {
     const matches = [];
 
     const subContributorsPromises = contributionsRepos.map(async (item) => {
-      console.log(`========`, item);
       const contributorsSub = await this.getContributors(item, headers);
 
       matches.push({

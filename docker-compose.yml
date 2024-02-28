@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: github-contributors
+    environment:
+      - PORT=${PORT}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./src:/app/src

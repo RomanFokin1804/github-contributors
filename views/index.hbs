@@ -5,9 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Github contributors</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
     .container {
       display: flex;
       align-items: center;
+      margin-bottom: 20px;
     }
     .container p {
       margin-right: 10px;
@@ -15,16 +21,44 @@
     .container input[type="text"] {
       margin-right: 10px;
       width: 300px; /* Задати більшу ширину */
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
     .container button {
       margin-right: 10px;
+      padding: 8px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container button:hover {
+      background-color: #0056b3;
     }
     .item {
       display: flex;
       align-items: center;
+      margin-bottom: 10px;
     }
     .item a {
       margin-right: 5px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .item a:hover {
+      text-decoration: underline;
+    }
+    .item p {
+      margin: 0;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border: 1px solid #f5c6cb;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -34,6 +68,9 @@
   <input type="text" name="url" placeholder="Enter repository URL" value={{url}}>
   <button type="submit">Start</button>
 </form>
+{{#if error}}
+  <div class="error">{{error}}</div>
+{{/if}}
 <ol>
   {{#each result}}
     <li>

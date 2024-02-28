@@ -51,3 +51,9 @@ export interface IGithubContributions {
     avatar_url: string;
   };
 }
+
+export interface IGetReposWithSimilarContributorsRes {
+  name: string;
+  link: string;
+  matches: number;
+}
