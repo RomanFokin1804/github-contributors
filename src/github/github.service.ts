@@ -87,7 +87,7 @@ export class GithubService {
       try {
         const contributorsMainCurrentRes: AxiosResponse<IGithubContributors[]> =
           await axios.get(
-            `https://api.github.com/repos/${ownerAndRepo}/contributors?per_page=10&page=${page}`,
+            `https://api.github.com/repos/${ownerAndRepo}/contributors?per_page=100&page=${page}`,
             { headers },
           );
 
