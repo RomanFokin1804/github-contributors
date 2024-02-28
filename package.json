@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:build": "docker build -t github-contributors .",
     "docker:run": "docker run -p80:3000 github-contributors",
-    "docker:local": "docker compose up"
+    "docker:compose": "docker compose up"
   },
   "dependencies": {
     "@nestjs/common": "10.3.3",
