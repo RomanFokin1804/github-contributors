@@ -1,17 +1,20 @@
-import { Body, Controller, Get, Post, Query, Render } from '@nestjs/common';
+import { Controller, Get, Query, Render } from '@nestjs/common';
+import { GithubService } from './github/github.service';
 
 @Controller()
 export class AppController {
+  constructor(readonly githubService: GithubService) {}
   private result: any[];
 
   @Get()
   @Render('index')
-  root(@Query('repo') repo?: string) {
-    if (repo) {
-      this.result = repo.split('');
-      return { result: this.result, repo };
+  async root(@Query('url') url?: string) {
+    if (url) {
+      this.result =
+        await this.githubService.getReposWithSimilarContributors(url);
+      return { result: this.result, url };
     }
 
-    return { repo };
+    return { url };
   }
 }

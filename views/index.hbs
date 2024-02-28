@@ -3,31 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App</title>
+  <title>Github contributors</title>
   <style>
-    form {
-      display: flex; /* Встановлюємо flex контейнер для форми */
-      align-items: center; /* Вирівнюємо елементи вертикально */
+    .container {
+      display: flex;
+      align-items: center;
     }
-    form p {
-      margin-right: 10px; /* Задаємо відступ для тексту "Repository URL" */
+    .container p {
+      margin-right: 10px;
     }
-    form input[type="text"],
-    form button {
-      margin-right: 10px; /* Задаємо відступ для input та кнопки */
+    .container input[type="text"] {
+      margin-right: 10px;
+      width: 300px; /* Задати більшу ширину */
+    }
+    .container button {
+      margin-right: 10px;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+    }
+    .item a {
+      margin-right: 5px;
     }
   </style>
 </head>
 <body>
-<form action="/" method="get">
+<form action="/" method="get" class="container">
   <p>Repository URL:</p>
-  <input type="text" name="repo" placeholder="Enter repository URL" value={{repo}}>
+  <input type="text" name="url" placeholder="Enter repository URL" value={{url}}>
   <button type="submit">Start</button>
 </form>
-<ul>
+<ol>
   {{#each result}}
-    <li>{{this}}</li>
+    <li>
+      <div class="item">
+        <a href="{{this.link}}">{{this.name}}</a><p>- {{this.matches}} common contributors</p>
+      </div>
+    </li>
   {{/each}}
-</ul>
+</ol>
 </body>
 </html>
