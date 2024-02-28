@@ -57,3 +57,8 @@ export interface IGetReposWithSimilarContributorsRes {
   link: string;
   matches: number;
 }
+
+export interface IMatches {
+  name: string;
+  matches: number;
+}

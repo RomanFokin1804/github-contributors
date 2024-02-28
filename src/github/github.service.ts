@@ -8,6 +8,7 @@ import {
   IGetReposWithSimilarContributorsRes,
   IGithubContributions,
   IGithubContributors,
+  IMatches,
 } from './github.interface';
 import { ConfigService } from '@nestjs/config';
 
@@ -100,12 +101,12 @@ export class GithubService {
         countOfContributorsOnCurrentPage = contributorsMainCurrent.length;
         page++;
       } catch (error) {
-        // console.log(
-        //   `WARNING FOR ${ownerAndRepo}:`,
-        //   error.response.status,
-        //   error.response.statusText,
-        //   error.response.data,
-        // );
+        console.log(
+          `WARNING FOR ${ownerAndRepo}:`,
+          error.response.status,
+          error.response.statusText,
+          error.response.data,
+        );
         // throw new UnprocessableEntityException('Incorrect URL!');
       }
     } while (countOfContributorsOnCurrentPage !== 0);
@@ -117,7 +118,6 @@ export class GithubService {
     const contributionsRepos: string[] = [];
 
     const contributionsPromises = contributors.map(async (item) => {
-      console.log(`===`, item);
       const contributionsRes: AxiosResponse<IGithubContributions[]> =
         await axios.get(`https://api.github.com/users/${item}/events`, {
           headers,
@@ -143,7 +143,7 @@ export class GithubService {
     contributionsRepos: string[],
     contributorsMain: string[],
     headers,
-  ) {
+  ): Promise<IMatches[]> {
     const matches = [];
 
     const subContributorsPromises = contributionsRepos.map(async (item) => {
@@ -160,14 +160,12 @@ export class GithubService {
     return matches;
   }
 
-  removeDuplicates(contributions, mainRepository) {
+  removeDuplicates(contributions: string[], mainRepository: string): string[] {
     const repositories = {};
     const result = [];
 
     for (const contribution of contributions) {
-      const [author, repository] = contribution
-        .split('/')
-        .map((str) => str.trim());
+      const [, repository] = contribution.split('/').map((str) => str.trim());
 
       if (!repositories[repository] && repository !== mainRepository) {
         repositories[repository] = true;
@@ -178,7 +176,7 @@ export class GithubService {
     return result;
   }
 
-  countMatches(array1, array2) {
+  countMatches(array1: string[], array2: string[]): number {
     const matches = array1.filter((item) => array2.includes(item));
     return matches.length;
   }
